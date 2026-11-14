@@ -18,6 +18,7 @@ export interface CacheEntry<T> {
 
 export interface SectionProvider<T> {
   key: SectionKey;
+  init?(): Promise<void>;
   fetch(): Promise<FetchResult<T>>;
   nextRunAt(entry: CacheEntry<T> | null, now: Date): Date;
 }

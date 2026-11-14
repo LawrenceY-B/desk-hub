@@ -1,3 +1,5 @@
+import type { TrackOutline } from '@/types/track.js';
+
 
 export interface ScheduledTime {
   date: string;
@@ -93,6 +95,17 @@ export interface Standings<T> {
   season: number;
   round: number;
   entries: T[];
+}
+
+export interface NextRace extends Race {
+  track: TrackOutline | null;
+}
+
+export interface F1Section {
+  nextRace: NextRace | null;
+  lastResult: RaceResult | null;
+  drivers: Standings<DriverStanding> | null;
+  constructors: Standings<ConstructorStanding> | null;
 }
 
 export interface JolpicaResponse<T> {
