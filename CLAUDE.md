@@ -24,6 +24,7 @@ This is a learning project. **Lawrence writes the code.** Claude's job is to gui
 - Dates in UTC ISO strings. Missing numbers are `null`, never `0`.
 - No secrets in code or logs. Third-party tokens (Azure DevOps PAT, Spotify) are stored encrypted and never returned by the API.
 - Type check with `tsc --noEmit` before calling a step done (`tsx` does not type-check).
+- Comments: Lawrence doesn't like them. Only comment code that is genuinely complex or non-obvious (a why, not a what). No doc comments on simple functions or types, no section banners, no commented-out code.
 - MCP server: never write to stdout in stdio mode (log to stderr).
 - Commits: conventional commits. **Never add Claude attribution to commits or PRs.**
 
