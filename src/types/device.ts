@@ -10,6 +10,13 @@ export interface DeviceRecord {
   name: string;
   keyHash: string;
   lastSeenAt: string | null;
+  revokedAt: string | null;
+}
+
+export interface DeviceSummary extends DeviceIdentity {
+  createdAt: string;
+  lastSeenAt: string | null;
+  revokedAt: string | null;
 }
 
 export interface SectionPayload {
@@ -51,6 +58,7 @@ export interface DeviceHubDeps {
   aggregator: Pick<Aggregator, 'getAll' | 'on' | 'off'>;
   authenticate: (key: string) => Promise<DeviceIdentity | null>;
   onSeen?: (device: DeviceIdentity) => void;
+  isActive?: (deviceId: string) => Promise<boolean>;
   heartbeatMs: number;
   now: () => Date;
   log: (message: string) => void;

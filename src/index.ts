@@ -4,7 +4,7 @@ import { connectDb, disconnectDb } from '@/config/db.js';
 import { env } from '@/config/env.js';
 import { createDeviceHub, DEVICE_PATH } from '@/device/device-hub.js';
 import { createF1Provider } from '@/providers/f1.provider.js';
-import { authenticateDevice, markDeviceSeen } from '@/services/device.service.js';
+import { authenticateDevice, isDeviceActive, markDeviceSeen } from '@/services/device.service.js';
 
 const HEARTBEAT_MS = 30_000;
 
@@ -36,6 +36,7 @@ const pendingWrites = new Set<Promise<void>>();
 const deviceHub = createDeviceHub(server, {
   aggregator,
   authenticate: authenticateDevice,
+  isActive: isDeviceActive,
   onSeen: (device) => {
     const write = markDeviceSeen(device.id, new Date())
       .catch((err: unknown) => {

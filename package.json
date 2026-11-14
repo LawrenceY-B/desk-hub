@@ -14,7 +14,9 @@
     "typecheck": "tsc --noEmit",
     "build:tracks": "tsx --env-file-if-exists=.env src/scripts/build-tracks.ts",
     "test": "tsx --env-file=.env.test --test 'src/**/*.test.ts'",
-    "device:create": "tsx --env-file-if-exists=.env src/scripts/create-device.ts"
+    "device:create": "tsx --env-file-if-exists=.env src/scripts/create-device.ts",
+    "device:revoke": "tsx --env-file-if-exists=.env src/scripts/revoke-device.ts",
+    "device:list": "tsx --env-file-if-exists=.env src/scripts/list-devices.ts"
   },
   "dependencies": {
     "mongoose": "^9.12.1",

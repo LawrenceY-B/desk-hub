@@ -10,6 +10,7 @@ import { buildSnapshot, toSectionPayload } from './payload.js';
 export const DEVICE_PATH = '/device';
 const MAX_INCOMING_BYTES = 16 * 1024;
 const CLOSE_REPLACED = 4000;
+const CLOSE_REVOKED = 4001;
 const CLOSE_GOING_AWAY = 1001;
 const CLOSE_TIMEOUT_MS = 2000;
 
@@ -143,7 +144,21 @@ export function createDeviceHub(server: Server, deps: DeviceHubDeps): DeviceHub 
       }
       client.alive = false;
       client.socket.ping();
+      void dropIfRevoked(client);
     }
+  }
+
+  // Keys are only checked on connect, so a key revoked mid-connection is caught here.
+  async function dropIfRevoked(client: Client): Promise<void> {
+    if (!deps.isActive) return;
+    try {
+      if (await deps.isActive(client.device.id)) return;
+    } catch (err) {
+      deps.log(`could not check device "${client.device.name}": ${err instanceof Error ? err.message : String(err)}`);
+      return;
+    }
+    deps.log(`device "${client.device.name}" was revoked, disconnecting`);
+    client.socket.close(CLOSE_REVOKED, 'device revoked');
   }
 
   const upgradeListener = (req: IncomingMessage, socket: Duplex, head: Buffer) => void onUpgrade(req, socket, head);

@@ -255,6 +255,34 @@ describe('connections', () => {
     assert.equal(socket.readyState, WebSocket.OPEN);
   });
 
+  test('a device revoked while connected is disconnected at the next heartbeat', async () => {
+    let active = true;
+    const { url } = await start({ heartbeatMs: 30, isActive: async () => active });
+    const { socket } = connect(url);
+    await opened(socket);
+    await new Promise((r) => setTimeout(r, 80));
+    assert.equal(socket.readyState, WebSocket.OPEN);
+
+    const code = closed(socket);
+    active = false;
+    assert.equal(await code, 4001);
+    assert.ok(logs.some((l) => l.includes('was revoked')));
+  });
+
+  test('if the revoke check fails (Mongo down), the device stays connected', async () => {
+    const { url } = await start({
+      heartbeatMs: 30,
+      isActive: async () => {
+        throw new Error('mongo down');
+      },
+    });
+    const { socket } = connect(url);
+    await opened(socket);
+    await new Promise((r) => setTimeout(r, 120));
+    assert.equal(socket.readyState, WebSocket.OPEN);
+    assert.ok(logs.some((l) => l.includes('could not check')));
+  });
+
   test('close() tells devices the server is going away', async () => {
     const { url } = await start();
     const { socket } = connect(url);

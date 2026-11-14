@@ -89,10 +89,10 @@ src/
   test/          shared test helpers
 ```
 
-Scripts: `npm run dev` (tsx watch, loads `.env`), `npm run typecheck`, `npm test` (node:test via tsx, `*.test.ts` next to the code), `npm run build:tracks` (regenerates track outlines), `npm run device:create -- "Name"` (prints a device key once; only its SHA-256 hash is stored), `npm run build` (cleans `build/`, compiles with `tsconfig.build.json`, which leaves out tests, `src/test` and `src/scripts`, then tsc-alias rewrites `@/` to relative paths), `npm start`.
+Scripts: `npm run dev` (tsx watch, loads `.env`), `npm run typecheck`, `npm test` (node:test via tsx, `*.test.ts` next to the code), `npm run build:tracks` (regenerates track outlines), `npm run device:create -- "Name"` (prints a device key once; only its SHA-256 hash is stored), `npm run device:list`, `npm run device:revoke -- <id or exact name>` (sets `revokedAt`; the hub re-checks connected devices each heartbeat and closes them with 4001), `npm run build` (cleans `build/`, compiles with `tsconfig.build.json`, which leaves out tests, `src/test` and `src/scripts`, then tsc-alias rewrites `@/` to relative paths), `npm start`.
 Local MongoDB runs in Docker: `docker compose up -d` (`compose.yaml`, `mongo:7`, bound to 127.0.0.1, `mongo-data` volume). `MONGODB_URI` is required; tests use `.env.test` (committed, no secrets). DB tests call `useTestDatabase(name)` from `src/test/db.ts`, which gives each test file its own `desk-hub-test-<name>` database (files run in parallel) and skips when Mongo is down.
 Node 22+, TypeScript 6, ESM (`"type": "module"`, NodeNext). Express, Mongoose and the MCP SDK get added in the steps that need them.
 
 ## Status
 
-Steps 1–5 done. Step 6 mostly done: aggregator, section cache, device hub (auth by hashed key, snapshot, `section`, resume via `X-Resume: <epoch>:<seq>`, 30s ping). The device gets trimmed display data (`src/device/display/`, F1 16 KB → 2.9 KB, shaped by the Desk Hub UI F1 artboard); the cache keeps full data for the web app. Left in step 6: `device:revoke`, then `config.changed`, `jarvis.*`, `alert.*`, `task.done` once the web API and Jarvis exist.
+Steps 1–5 done. Step 6 mostly done: aggregator, section cache, device hub (auth by hashed key, snapshot, `section`, resume via `X-Resume: <epoch>:<seq>`, 30s ping). The device gets trimmed display data (`src/device/display/`, F1 16 KB → 2.9 KB, shaped by the Desk Hub UI F1 artboard); the cache keeps full data for the web app. Left in step 6: `config.changed`, `jarvis.*`, `alert.*`, `task.done` once the web API and Jarvis exist.
