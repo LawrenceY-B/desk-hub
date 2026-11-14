@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict';
-import { after, before, beforeEach, describe, test, type TestContext } from 'node:test';
-import mongoose from 'mongoose';
-import { env } from '@/config/env.js';
+import { beforeEach, describe, test } from 'node:test';
 import { RaceModel } from '@/models/race.model.js';
+import { useTestDatabase } from '@/test/db.js';
 import type { Race } from '@/types/f1.js';
 import { loadCalendar, saveCalendar } from './calendar.service.js';
 
@@ -26,30 +25,13 @@ function makeRace(round: number, overrides: Partial<Race> = {}): Race {
   };
 }
 
-let connected = false;
-const requireDb = (t: TestContext) => {
-  if (!connected) t.skip('MongoDB not running (docker compose up -d)');
-  return connected;
-};
-
 describe('calendar.service (MongoDB)', () => {
-  before(async () => {
-    try {
-      await mongoose.connect(env.MONGODB_URI, { serverSelectionTimeoutMS: 2000 });
-      await RaceModel.syncIndexes();
-      connected = true;
-    } catch {
-      connected = false;
-    }
+  const { isConnected, requireDb } = useTestDatabase('calendar', async () => {
+    await RaceModel.syncIndexes();
   });
 
   beforeEach(async () => {
-    if (connected) await RaceModel.deleteMany({});
-  });
-
-  after(async () => {
-    if (connected) await mongoose.connection.dropDatabase();
-    await mongoose.disconnect();
+    if (isConnected()) await RaceModel.deleteMany({});
   });
 
   test('saves and loads a calendar unchanged, including nulls', async (t) => {

@@ -83,10 +83,11 @@ src/
   routes/        Express routers
   mcp/tools/     MCP tool definitions
   utils/         small helpers
+  test/          shared test helpers
 ```
 
 Scripts: `npm run dev` (tsx watch, loads `.env`), `npm run typecheck`, `npm test` (node:test via tsx, `*.test.ts` next to the code), `npm run build:tracks` (regenerates track outlines), `npm run build` (tsc to `build/`, then tsc-alias rewrites `@/` to relative paths), `npm start`.
-Local MongoDB runs in Docker: `docker compose up -d` (`compose.yaml`, `mongo:7`, bound to 127.0.0.1, `mongo-data` volume). `MONGODB_URI` is required; tests use `.env.test` (committed, no secrets) and the `desk-hub-test` database; DB tests skip when Mongo is down.
+Local MongoDB runs in Docker: `docker compose up -d` (`compose.yaml`, `mongo:7`, bound to 127.0.0.1, `mongo-data` volume). `MONGODB_URI` is required; tests use `.env.test` (committed, no secrets). DB tests call `useTestDatabase(name)` from `src/test/db.ts`, which gives each test file its own `desk-hub-test-<name>` database (files run in parallel) and skips when Mongo is down.
 Node 22+, TypeScript 6, ESM (`"type": "module"`, NodeNext). Express, Mongoose and the MCP SDK get added in the steps that need them.
 
 ## Status
