@@ -54,15 +54,19 @@ function fakeDeps(overrides: Partial<F1ProviderDeps> = {}) {
   return { deps, calls, saved };
 }
 
-function entry(data: F1Section, overrides: Partial<CacheEntry<F1Section>> = {}): CacheEntry<F1Section> {
+function entry(data: F1Section | null, overrides: Partial<CacheEntry<F1Section>> = {}): CacheEntry<F1Section> {
   return {
+    key: 'f1',
     data,
-    hash: 'h',
-    fetchedAt: '2026-11-14T12:00:00Z',
+    hash: data ? 'h' : null,
+    fetchedAt: data ? '2026-11-14T12:00:00Z' : null,
     asOf: null,
     stale: false,
     consecutiveFailures: 0,
     retryAt: null,
+    nextRunAt: '2026-11-14T12:00:00Z',
+    lastAttemptAt: null,
+    lastError: null,
     ...overrides,
   };
 }
@@ -128,7 +132,23 @@ describe('F1 provider nextRunAt', () => {
 
   test('never fetched: run now', () => {
     const now = new Date('2026-11-14T12:00:00Z');
-    assert.deepEqual(createF1Provider(fakeDeps().deps).nextRunAt(null, now), now);
+    assert.deepEqual(createF1Provider(fakeDeps().deps).nextRunAt(entry(null), now), now);
+  });
+
+  test('never succeeded and failing: backs off instead of retrying every tick', () => {
+    const now = new Date('2026-11-14T12:00:00Z');
+    const next = createF1Provider(fakeDeps().deps).nextRunAt(entry(null, { consecutiveFailures: 3 }), now);
+    assert.deepEqual(next, new Date(now.getTime() + 4 * 60 * 1000));
+  });
+
+  test('never succeeded and rate limited: waits for retryAt', () => {
+    const now = new Date('2026-11-14T12:00:00Z');
+    const retryAt = new Date(now.getTime() + 25 * HOUR);
+    const next = createF1Provider(fakeDeps().deps).nextRunAt(
+      entry(null, { consecutiveFailures: 1, retryAt: retryAt.toISOString() }),
+      now,
+    );
+    assert.deepEqual(next, retryAt);
   });
 
   test('uses the calendar loaded by init', async () => {

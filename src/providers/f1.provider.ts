@@ -79,9 +79,9 @@ export function createF1Provider(deps: F1ProviderDeps = defaultDeps): SectionPro
     },
 
     nextRunAt(entry, now) {
-      if (!entry) return now;
+      if (entry.data === null && entry.consecutiveFailures === 0) return now;
 
-      const lastResult = entry.data.lastResult;
+      const lastResult = entry.data?.lastResult ?? null;
       const season = calendar[0]?.season;
 
       return scheduleNextRun({
