@@ -75,6 +75,7 @@ src/
   types/         shared types (F1, payload, sections)
   clients/       thin HTTP clients for third parties (Jolpica first)
   providers/     one SectionProvider per section
+  models/        Mongoose schemas (one per collection)
   services/      business logic, no Express or MCP code
   data/          generated data (track outlines); never edit by hand
   scripts/       build-time scripts (build-tracks.ts)
@@ -85,7 +86,7 @@ src/
 ```
 
 Scripts: `npm run dev` (tsx watch, loads `.env`), `npm run typecheck`, `npm test` (node:test via tsx, `*.test.ts` next to the code), `npm run build:tracks` (regenerates track outlines), `npm run build` (tsc to `build/`, then tsc-alias rewrites `@/` to relative paths), `npm start`.
-Local MongoDB runs in Docker: `docker compose up -d` (`compose.yaml`, `mongo:7`, bound to 127.0.0.1, `mongo-data` volume). `MONGODB_URI` is required; tests use `.env.test` (committed, no secrets).
+Local MongoDB runs in Docker: `docker compose up -d` (`compose.yaml`, `mongo:7`, bound to 127.0.0.1, `mongo-data` volume). `MONGODB_URI` is required; tests use `.env.test` (committed, no secrets) and the `desk-hub-test` database; DB tests skip when Mongo is down.
 Node 22+, TypeScript 6, ESM (`"type": "module"`, NodeNext). Express, Mongoose and the MCP SDK get added in the steps that need them.
 
 ## Status
