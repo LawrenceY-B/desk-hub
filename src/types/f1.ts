@@ -61,8 +61,16 @@ export interface ResultEntry {
   positionsGained: number | null;
 }
 
+export interface FastestLap {
+  driver: Driver;
+  lap: number;
+  time: string;
+  avgSpeedKph: number | null;
+}
+
 export interface RaceResult extends RaceSummary {
   results: ResultEntry[];
+  fastestLap: FastestLap | null;
   biggestGain: { driver: Driver; positions: number } | null;
 }
 
@@ -170,7 +178,12 @@ export interface JolpicaResult {
   laps: string;
   status: string;
   Time?: { millis: string; time: string };
-  FastestLap?: { rank: string; lap: string; Time: { time: string } };
+  FastestLap?: {
+    rank: string;
+    lap: string;
+    Time: { time: string };
+    AverageSpeed?: { units: string; speed: string };
+  };
 }
 
 export interface JolpicaRaceWithResults extends JolpicaRace {

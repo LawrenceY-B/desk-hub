@@ -2,6 +2,7 @@ import type {
   ConstructorStanding,
   Driver,
   DriverStanding,
+  FastestLap,
   JolpicaConstructor,
   JolpicaConstructorStanding,
   JolpicaDriver,
@@ -97,8 +98,27 @@ function mapResultEntry(raw: JolpicaResult): ResultEntry {
   };
 }
 
+function mapFastestLap(results: JolpicaResult[]): FastestLap | null {
+  const entry = results.find((r) => r.FastestLap?.rank === '1');
+  const lap = entry?.FastestLap;
+  if (!entry || !lap) return null;
+
+  const speed = lap.AverageSpeed;
+
+  return {
+    driver: mapDriver(entry.Driver),
+    lap: requireNumber(lap.lap, 'fastest lap number'),
+    time: lap.Time.time,
+    avgSpeedKph: speed?.units === 'kph' ? toNumber(speed.speed) : null,
+  };
+}
+
 export function mapRaceResults(raw: JolpicaRaceWithResults): Omit<RaceResult, 'biggestGain'> {
-  return { ...mapRaceSummary(raw), results: raw.Results.map(mapResultEntry) };
+  return {
+    ...mapRaceSummary(raw),
+    results: raw.Results.map(mapResultEntry),
+    fastestLap: mapFastestLap(raw.Results),
+  };
 }
 
 function mapDriverStanding(raw: JolpicaDriverStanding): DriverStanding {
