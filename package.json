@@ -12,7 +12,8 @@
     "build": "tsc && tsc-alias",
     "start": "node --env-file-if-exists=.env build/index.js",
     "typecheck": "tsc --noEmit",
-    "build:tracks": "tsx --env-file-if-exists=.env src/scripts/build-tracks.ts"
+    "build:tracks": "tsx --env-file-if-exists=.env src/scripts/build-tracks.ts",
+    "test": "tsx --test 'src/**/*.test.ts'"
   },
   "dependencies": {
     "zod": "^4.6.7"

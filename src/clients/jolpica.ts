@@ -48,6 +48,10 @@ export function fetchNextRace(): Promise<JolpicaRacesResponse> {
     return jolpicaGet<JolpicaRacesResponse>('current/next/races/');
 }
 
+export function fetchSeasonRaces(): Promise<JolpicaRacesResponse> {
+    return jolpicaGet<JolpicaRacesResponse>('current/races/?limit=100');
+}
+
 export function fetchLastResults(): Promise<JolpicaResultsResponse> {
     return jolpicaGet<JolpicaResultsResponse>('current/last/results/');
 }

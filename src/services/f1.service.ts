@@ -5,6 +5,7 @@ import {
   fetchNextRace,
   fetchRaceResults,
   fetchRaceResultsAtCircuit,
+  fetchSeasonRaces,
 } from '@/clients/jolpica.js';
 import {
   mapConstructorStandings,
@@ -25,6 +26,10 @@ import type {
 export async function getNextRace(): Promise<Race | null> {
   const raw = (await fetchNextRace()).MRData.RaceTable.Races[0];
   return raw ? mapRace(raw) : null;
+}
+
+export async function getSeasonCalendar(): Promise<Race[]> {
+  return (await fetchSeasonRaces()).MRData.RaceTable.Races.map(mapRace);
 }
 
 export async function getLastResult(): Promise<RaceResult | null> {

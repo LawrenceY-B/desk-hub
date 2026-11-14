@@ -59,8 +59,8 @@ Rule: only the backend talks to third parties and holds secrets. The display and
 2. ✅ Types and Jolpica client (User-Agent, 429 handling, zod env)
 3. ✅ F1 service: next race, last result, past rounds, results by circuit, standings
 4. ✅ Track outlines (`npm run build:tracks`, `getTrackOutline`)
-5. Refresh schedule logic, with unit tests ← **start here**
-6. Aggregator payload and device WebSocket
+5. ✅ Refresh schedule logic, with unit tests (`src/providers/f1.schedule.ts`, `npm test`)
+6. Aggregator payload and device WebSocket ← **start here**
 7. F1 MCP tools (same structure as the `lyb-cedi-market` MCP server)
 8. Test in Claude Desktop
 
@@ -84,9 +84,9 @@ src/
   utils/         small helpers
 ```
 
-Scripts: `npm run dev` (tsx watch, loads `.env`), `npm run typecheck`, `npm run build:tracks` (regenerates track outlines), `npm run build` (tsc to `build/`, then tsc-alias rewrites `@/` to relative paths), `npm start`.
+Scripts: `npm run dev` (tsx watch, loads `.env`), `npm run typecheck`, `npm test` (node:test via tsx, `*.test.ts` next to the code), `npm run build:tracks` (regenerates track outlines), `npm run build` (tsc to `build/`, then tsc-alias rewrites `@/` to relative paths), `npm start`.
 Node 22+, TypeScript 6, ESM (`"type": "module"`, NodeNext). Express, Mongoose and the MCP SDK get added in the steps that need them.
 
 ## Status
 
-Steps 1–4 done. Next: step 5, refresh schedule logic with unit tests.
+Steps 1–5 done. Next: step 6, aggregator payload and device WebSocket.
