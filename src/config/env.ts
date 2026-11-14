@@ -5,6 +5,7 @@ const EnvSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535).default(4000),
   JOLPICA_BASE_URL: z.url().default('https://api.jolpi.ca/ergast/f1'),
   USER_AGENT: z.string().min(1).default('DeskHub/0.1.0'),
+  MONGODB_URI: z.string().regex(/^mongodb(\+srv)?:\/\/.+/, 'must start with mongodb:// or mongodb+srv://'),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

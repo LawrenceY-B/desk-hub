@@ -85,6 +85,7 @@ src/
 ```
 
 Scripts: `npm run dev` (tsx watch, loads `.env`), `npm run typecheck`, `npm test` (node:test via tsx, `*.test.ts` next to the code), `npm run build:tracks` (regenerates track outlines), `npm run build` (tsc to `build/`, then tsc-alias rewrites `@/` to relative paths), `npm start`.
+Local MongoDB runs in Docker: `docker compose up -d` (`compose.yaml`, `mongo:7`, bound to 127.0.0.1, `mongo-data` volume). `MONGODB_URI` is required; tests use `.env.test` (committed, no secrets).
 Node 22+, TypeScript 6, ESM (`"type": "module"`, NodeNext). Express, Mongoose and the MCP SDK get added in the steps that need them.
 
 ## Status

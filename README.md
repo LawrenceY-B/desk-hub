@@ -2,6 +2,12 @@
 
 Node + TypeScript backend for Desk Hub: an ESP32-S3 touch display, a React web app and the Jarvis voice assistant.
 
+## Setup
+
+1. `cp .env.example .env`
+2. `docker compose up -d` to start MongoDB
+3. `npm install` then `npm run dev`
+
 ## Scripts
 
 - `npm run dev` – run with watch mode
