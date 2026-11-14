@@ -10,6 +10,8 @@ import type {
 const BASE_URL = env.JOLPICA_BASE_URL;
 const USER_AGENT = env.USER_AGENT;
 const DEFAULT_RETRY_MS = 60_000;
+// Jolpica pages by result rows (30 by default, 100 at most), not by races.
+const PAGE = '?limit=100';
 
 export class JolpicaRateLimitError extends RateLimitError {
     constructor(retryAt: Date) {
@@ -40,7 +42,18 @@ async function jolpicaGet<T>(path: string): Promise<T> {
     if (res.status === 429) throw new JolpicaRateLimitError(parseRetryAfter(res.headers.get('retry-after')));
     if (!res.ok) throw new Error(`Jolpica ${res.status} for ${path}`);
 
-    return (await res.json()) as T;
+    const body = (await res.json()) as T;
+    warnIfTruncated(path, body);
+    return body;
+}
+
+function warnIfTruncated(path: string, body: unknown): void {
+    const page = (body as { MRData?: { total?: string; limit?: string; offset?: string } }).MRData;
+    if (!page?.total || !page.limit) return;
+    const shown = Number(page.offset ?? 0) + Number(page.limit);
+    if (Number(page.total) > shown) {
+        console.error(`[jolpica] ${path} returned ${shown} of ${page.total} rows; the rest were cut off`);
+    }
 }
 
 export function fetchNextRace(): Promise<JolpicaRacesResponse> {
@@ -48,29 +61,29 @@ export function fetchNextRace(): Promise<JolpicaRacesResponse> {
 }
 
 export function fetchSeasonRaces(): Promise<JolpicaRacesResponse> {
-    return jolpicaGet<JolpicaRacesResponse>('current/races/?limit=100');
+    return jolpicaGet<JolpicaRacesResponse>(`current/races/${PAGE}`);
 }
 
 export function fetchLastResults(): Promise<JolpicaResultsResponse> {
-    return jolpicaGet<JolpicaResultsResponse>('current/last/results/');
+    return jolpicaGet<JolpicaResultsResponse>(`current/last/results/${PAGE}`);
 }
 
 export function fetchRaceResults(season: number, round: number): Promise<JolpicaResultsResponse> {
-    return jolpicaGet<JolpicaResultsResponse>(`${season}/${round}/results/`);
+    return jolpicaGet<JolpicaResultsResponse>(`${season}/${round}/results/${PAGE}`);
 }
 
 export function fetchRaceResultsAtCircuit(season: number, circuitId: string): Promise<JolpicaResultsResponse> {
-    return jolpicaGet<JolpicaResultsResponse>(`${season}/circuits/${encodeURIComponent(circuitId)}/results/`);
+    return jolpicaGet<JolpicaResultsResponse>(`${season}/circuits/${encodeURIComponent(circuitId)}/results/${PAGE}`);
 }
 
 export function fetchDriverStandings(): Promise<JolpicaStandingsResponse> {
-    return jolpicaGet<JolpicaStandingsResponse>('current/driverStandings/');
+    return jolpicaGet<JolpicaStandingsResponse>(`current/driverStandings/${PAGE}`);
 }
 
 export function fetchConstructorStandings(): Promise<JolpicaStandingsResponse> {
-    return jolpicaGet<JolpicaStandingsResponse>('current/constructorStandings/');
+    return jolpicaGet<JolpicaStandingsResponse>(`current/constructorStandings/${PAGE}`);
 }
 
 export function fetchAllCircuits(): Promise<JolpicaCircuitsResponse> {
-    return jolpicaGet<JolpicaCircuitsResponse>('circuits/?limit=100');
+    return jolpicaGet<JolpicaCircuitsResponse>(`circuits/${PAGE}`);
 }
