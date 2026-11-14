@@ -14,6 +14,7 @@ Node + TypeScript backend for Desk Hub: an ESP32-S3 touch display, a React web a
 - `npm run typecheck` – type check
 - `npm run build` / `npm start` – compile and run
 - `npm run build:tracks` – regenerate `src/data/track-outlines.generated.ts`
+- `npm run device:create -- "Desk display"` – register a display and print its key (shown once)
 
 ## Credits
 

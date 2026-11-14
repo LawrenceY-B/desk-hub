@@ -77,6 +77,7 @@ src/
   clients/       thin HTTP clients for third parties (Jolpica first)
   providers/     one SectionProvider per section
   aggregator/    runs providers on schedule, caches to Mongo, emits `section` events
+  device/        device WebSocket hub (`/device`) and payload builders
   models/        Mongoose schemas (one per collection)
   services/      business logic, no Express or MCP code
   data/          generated data (track outlines); never edit by hand
@@ -88,10 +89,10 @@ src/
   test/          shared test helpers
 ```
 
-Scripts: `npm run dev` (tsx watch, loads `.env`), `npm run typecheck`, `npm test` (node:test via tsx, `*.test.ts` next to the code), `npm run build:tracks` (regenerates track outlines), `npm run build` (cleans `build/`, compiles with `tsconfig.build.json`, which leaves out tests, `src/test` and `src/scripts`, then tsc-alias rewrites `@/` to relative paths), `npm start`.
+Scripts: `npm run dev` (tsx watch, loads `.env`), `npm run typecheck`, `npm test` (node:test via tsx, `*.test.ts` next to the code), `npm run build:tracks` (regenerates track outlines), `npm run device:create -- "Name"` (prints a device key once; only its SHA-256 hash is stored), `npm run build` (cleans `build/`, compiles with `tsconfig.build.json`, which leaves out tests, `src/test` and `src/scripts`, then tsc-alias rewrites `@/` to relative paths), `npm start`.
 Local MongoDB runs in Docker: `docker compose up -d` (`compose.yaml`, `mongo:7`, bound to 127.0.0.1, `mongo-data` volume). `MONGODB_URI` is required; tests use `.env.test` (committed, no secrets). DB tests call `useTestDatabase(name)` from `src/test/db.ts`, which gives each test file its own `desk-hub-test-<name>` database (files run in parallel) and skips when Mongo is down.
 Node 22+, TypeScript 6, ESM (`"type": "module"`, NodeNext). Express, Mongoose and the MCP SDK get added in the steps that need them.
 
 ## Status
 
-Steps 1–5 done. Next: step 6, aggregator payload and device WebSocket.
+Steps 1–5 done. Step 6 mostly done: aggregator, section cache, device hub (auth by hashed key, snapshot, `section`, resume via `X-Resume: <epoch>:<seq>`, 30s ping). Left in step 6: trim the display payload (F1 is ~16 KB), then `config.changed`, `jarvis.*`, `alert.*`, `task.done` once the web API and Jarvis exist.
