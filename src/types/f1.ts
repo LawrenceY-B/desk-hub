@@ -13,7 +13,6 @@ export interface Circuit {
   long: number;
 }
 
-
 export interface RaceSessions {
   fp1: ScheduledTime | null;
   fp2: ScheduledTime | null;
@@ -31,6 +30,62 @@ export interface Race extends ScheduledTime {
   sessions: RaceSessions;
 }
 
+export type RaceSummary = Omit<Race, 'sessions'>;
+
+export interface Driver {
+  id: string;
+  number: number | null;
+  code: string | null;
+  firstName: string;
+  lastName: string;
+  nationality: string;
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  nationality: string;
+}
+
+export interface ResultEntry {
+  position: number;
+  classified: boolean;
+  status: string;
+  driver: Driver;
+  team: Team;
+  grid: number | null;
+  laps: number;
+  points: number;
+  time: string | null;
+  fastestLap: boolean;
+  positionsGained: number | null;
+}
+
+export interface RaceResult extends RaceSummary {
+  results: ResultEntry[];
+  biggestGain: { driver: Driver; positions: number } | null;
+}
+
+export interface DriverStanding {
+  position: number | null;
+  points: number;
+  wins: number;
+  driver: Driver;
+  teams: Team[];
+}
+
+export interface ConstructorStanding {
+  position: number | null;
+  points: number;
+  wins: number;
+  team: Team;
+}
+
+export interface Standings<T> {
+  season: number;
+  round: number;
+  entries: T[];
+}
 
 export interface JolpicaResponse<T> {
   MRData: {
@@ -43,10 +98,10 @@ export interface JolpicaResponse<T> {
   } & T;
 }
 
-export interface JolpicaRaceTable {
+export interface JolpicaRaceTable<R = JolpicaRace> {
   season: string;
   round?: string;
-  Races: JolpicaRace[];
+  Races: R[];
 }
 
 export interface JolpicaLocation {
@@ -85,3 +140,72 @@ export interface JolpicaRace extends JolpicaSessionTime {
 }
 
 export type JolpicaRacesResponse = JolpicaResponse<{ RaceTable: JolpicaRaceTable }>;
+
+export interface JolpicaDriver {
+  driverId: string;
+  permanentNumber?: string;
+  code?: string;
+  url: string;
+  givenName: string;
+  familyName: string;
+  dateOfBirth: string;
+  nationality: string;
+}
+
+export interface JolpicaConstructor {
+  constructorId: string;
+  url: string;
+  name: string;
+  nationality: string;
+}
+
+export interface JolpicaResult {
+  number: string;
+  position: string;
+  positionText: string;
+  points: string;
+  Driver: JolpicaDriver;
+  Constructor: JolpicaConstructor;
+  grid: string;
+  laps: string;
+  status: string;
+  Time?: { millis: string; time: string };
+  FastestLap?: { rank: string; lap: string; Time: { time: string } };
+}
+
+export interface JolpicaRaceWithResults extends JolpicaRace {
+  Results: JolpicaResult[];
+}
+
+export interface JolpicaDriverStanding {
+  position?: string;
+  positionText: string;
+  points: string;
+  wins: string;
+  Driver: JolpicaDriver;
+  Constructors: JolpicaConstructor[];
+}
+
+export interface JolpicaConstructorStanding {
+  position?: string;
+  positionText: string;
+  points: string;
+  wins: string;
+  Constructor: JolpicaConstructor;
+}
+
+export interface JolpicaStandingsList {
+  season: string;
+  round: string;
+  DriverStandings?: JolpicaDriverStanding[];
+  ConstructorStandings?: JolpicaConstructorStanding[];
+}
+
+export interface JolpicaStandingsTable {
+  season: string;
+  round?: string;
+  StandingsLists: JolpicaStandingsList[];
+}
+
+export type JolpicaResultsResponse = JolpicaResponse<{ RaceTable: JolpicaRaceTable<JolpicaRaceWithResults> }>;
+export type JolpicaStandingsResponse = JolpicaResponse<{ StandingsTable: JolpicaStandingsTable }>;

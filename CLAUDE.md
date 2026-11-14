@@ -56,9 +56,9 @@ Rule: only the backend talks to third parties and holds secrets. The display and
 ## Build steps
 
 1. ✅ Explore Jolpica responses by hand
-2. Types and Jolpica client (User-Agent, cache, 429 handling) ← **start here**
-3. F1 service: next race, last result, standings
-4. Track outlines
+2. ✅ Types and Jolpica client (User-Agent, 429 handling, zod env)
+3. ✅ F1 service: next race, last result, past rounds, results by circuit, standings
+4. Track outlines ← **start here**
 5. Refresh schedule logic, with unit tests
 6. Aggregator payload and device WebSocket
 7. F1 MCP tools (same structure as the `lyb-cedi-market` MCP server)
@@ -87,4 +87,4 @@ Node 22+, TypeScript 6, ESM (`"type": "module"`, NodeNext). Express, Mongoose an
 
 ## Status
 
-Scaffold done (package.json, tsconfig, folders, .env.example). Next: step 2, written by Lawrence.
+Steps 1–3 done. Next: step 4, track outlines.

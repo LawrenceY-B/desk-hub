@@ -1,5 +1,5 @@
 import { env } from '@/config/env.js';
-import type { JolpicaRacesResponse } from '@/types/f1.js';
+import type { JolpicaRacesResponse, JolpicaResultsResponse, JolpicaStandingsResponse } from '@/types/f1.js';
 
 const BASE_URL = env.JOLPICA_BASE_URL;
 const USER_AGENT = env.USER_AGENT;
@@ -39,6 +39,26 @@ async function jolpicaGet<T>(path: string): Promise<T> {
     return (await res.json()) as T;
 }
 
-export function getNextRace(): Promise<JolpicaRacesResponse> {
+export function fetchNextRace(): Promise<JolpicaRacesResponse> {
     return jolpicaGet<JolpicaRacesResponse>('current/next/races/');
+}
+
+export function fetchLastResults(): Promise<JolpicaResultsResponse> {
+    return jolpicaGet<JolpicaResultsResponse>('current/last/results/');
+}
+
+export function fetchRaceResults(season: number, round: number): Promise<JolpicaResultsResponse> {
+    return jolpicaGet<JolpicaResultsResponse>(`${season}/${round}/results/`);
+}
+
+export function fetchRaceResultsAtCircuit(season: number, circuitId: string): Promise<JolpicaResultsResponse> {
+    return jolpicaGet<JolpicaResultsResponse>(`${season}/circuits/${encodeURIComponent(circuitId)}/results/`);
+}
+
+export function fetchDriverStandings(): Promise<JolpicaStandingsResponse> {
+    return jolpicaGet<JolpicaStandingsResponse>('current/driverStandings/');
+}
+
+export function fetchConstructorStandings(): Promise<JolpicaStandingsResponse> {
+    return jolpicaGet<JolpicaStandingsResponse>('current/constructorStandings/');
 }
