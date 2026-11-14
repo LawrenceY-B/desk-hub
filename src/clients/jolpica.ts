@@ -1,5 +1,10 @@
 import { env } from '@/config/env.js';
-import type { JolpicaRacesResponse, JolpicaResultsResponse, JolpicaStandingsResponse } from '@/types/f1.js';
+import type {
+    JolpicaCircuitsResponse,
+    JolpicaRacesResponse,
+    JolpicaResultsResponse,
+    JolpicaStandingsResponse,
+} from '@/types/f1.js';
 
 const BASE_URL = env.JOLPICA_BASE_URL;
 const USER_AGENT = env.USER_AGENT;
@@ -61,4 +66,8 @@ export function fetchDriverStandings(): Promise<JolpicaStandingsResponse> {
 
 export function fetchConstructorStandings(): Promise<JolpicaStandingsResponse> {
     return jolpicaGet<JolpicaStandingsResponse>('current/constructorStandings/');
+}
+
+export function fetchAllCircuits(): Promise<JolpicaCircuitsResponse> {
+    return jolpicaGet<JolpicaCircuitsResponse>('circuits/?limit=100');
 }

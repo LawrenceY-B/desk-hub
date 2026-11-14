@@ -58,8 +58,8 @@ Rule: only the backend talks to third parties and holds secrets. The display and
 1. ✅ Explore Jolpica responses by hand
 2. ✅ Types and Jolpica client (User-Agent, 429 handling, zod env)
 3. ✅ F1 service: next race, last result, past rounds, results by circuit, standings
-4. Track outlines ← **start here**
-5. Refresh schedule logic, with unit tests
+4. ✅ Track outlines (`npm run build:tracks`, `getTrackOutline`)
+5. Refresh schedule logic, with unit tests ← **start here**
 6. Aggregator payload and device WebSocket
 7. F1 MCP tools (same structure as the `lyb-cedi-market` MCP server)
 8. Test in Claude Desktop
@@ -76,15 +76,17 @@ src/
   clients/       thin HTTP clients for third parties (Jolpica first)
   providers/     one SectionProvider per section
   services/      business logic, no Express or MCP code
+  data/          generated data (track outlines); never edit by hand
+  scripts/       build-time scripts (build-tracks.ts)
   controllers/   Express handlers
   routes/        Express routers
   mcp/tools/     MCP tool definitions
   utils/         small helpers
 ```
 
-Scripts: `npm run dev` (tsx watch, loads `.env`), `npm run typecheck`, `npm run build` (tsc to `build/`, then tsc-alias rewrites `@/` to relative paths), `npm start`.
+Scripts: `npm run dev` (tsx watch, loads `.env`), `npm run typecheck`, `npm run build:tracks` (regenerates track outlines), `npm run build` (tsc to `build/`, then tsc-alias rewrites `@/` to relative paths), `npm start`.
 Node 22+, TypeScript 6, ESM (`"type": "module"`, NodeNext). Express, Mongoose and the MCP SDK get added in the steps that need them.
 
 ## Status
 
-Steps 1–3 done. Next: step 4, track outlines.
+Steps 1–4 done. Next: step 5, refresh schedule logic with unit tests.

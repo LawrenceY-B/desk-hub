@@ -222,3 +222,9 @@ export interface JolpicaStandingsTable {
 
 export type JolpicaResultsResponse = JolpicaResponse<{ RaceTable: JolpicaRaceTable<JolpicaRaceWithResults> }>;
 export type JolpicaStandingsResponse = JolpicaResponse<{ StandingsTable: JolpicaStandingsTable }>;
+
+export interface JolpicaCircuitTable {
+  Circuits: JolpicaCircuit[];
+}
+
+export type JolpicaCircuitsResponse = JolpicaResponse<{ CircuitTable: JolpicaCircuitTable }>;
