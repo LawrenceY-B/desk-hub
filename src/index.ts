@@ -1,2 +1,3 @@
-// Entry point. Step 2 starts in src/types and src/clients.
-console.log(`Desk Hub backend starting (${process.env.NODE_ENV ?? 'development'})`);
+import { env } from '@/config/env.js';
+
+console.log(`Desk Hub backend starting (${env.NODE_ENV}, port ${env.PORT})`);

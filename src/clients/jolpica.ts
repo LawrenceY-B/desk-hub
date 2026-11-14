@@ -1,7 +1,8 @@
+import { env } from '@/config/env.js';
 import type { JolpicaRacesResponse } from '@/types/f1.js';
 
-const BASE_URL = process.env.JOLPICA_BASE_URL ?? 'https://api.jolpi.ca/ergast/f1';
-const USER_AGENT = process.env.USER_AGENT ?? 'DeskHub/0.1.0';
+const BASE_URL = env.JOLPICA_BASE_URL;
+const USER_AGENT = env.USER_AGENT;
 const DEFAULT_RETRY_MS = 60_000;
 
 export class JolpicaRateLimitError extends Error {
@@ -41,14 +42,3 @@ async function jolpicaGet<T>(path: string): Promise<T> {
 export function getNextRace(): Promise<JolpicaRacesResponse> {
     return jolpicaGet<JolpicaRacesResponse>('current/next/races/');
 }
-
-// How the cache uses it(a sketch for step 5, not code to write yet)
-
-// try {
-//     const data = await provider.fetch(config);
-//     cache.set('f1', { data, fetchedAt: new Date().toISOString(), stale: false });
-// } catch (err) {
-//     const previous = cache.get('f1');
-//     if (previous) cache.set('f1', { ...previous, stale: true }); // keep the good data
-//     nextRunAt = err instanceof JolpicaRateLimitError ? err.retryAt : backoff(attempt);
-// }

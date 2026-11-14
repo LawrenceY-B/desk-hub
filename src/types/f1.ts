@@ -79,11 +79,9 @@ export interface JolpicaRace extends JolpicaSessionTime {
   ThirdPractice?: JolpicaSessionTime;
   Qualifying?: JolpicaSessionTime;
   Sprint?: JolpicaSessionTime;
-  /** 2024 onwards. */
   SprintQualifying?: JolpicaSessionTime;
-  /** 2023 name for sprint qualifying. */
+  /** 2023 name for SprintQualifying. */
   SprintShootout?: JolpicaSessionTime;
 }
 
-/** Shape of `/current/next/races/`, `/current/races/` and similar. */
 export type JolpicaRacesResponse = JolpicaResponse<{ RaceTable: JolpicaRaceTable }>;
