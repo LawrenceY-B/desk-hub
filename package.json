@@ -16,14 +16,18 @@
     "test": "tsx --env-file=.env.test --test 'src/**/*.test.ts'",
     "device:create": "tsx --env-file-if-exists=.env src/scripts/create-device.ts",
     "device:revoke": "tsx --env-file-if-exists=.env src/scripts/revoke-device.ts",
-    "device:list": "tsx --env-file-if-exists=.env src/scripts/list-devices.ts"
+    "device:list": "tsx --env-file-if-exists=.env src/scripts/list-devices.ts",
+    "mcp": "tsx --env-file-if-exists=.env src/mcp/stdio.ts",
+    "mcp:start": "node --env-file-if-exists=.env build/mcp/stdio.js"
   },
   "dependencies": {
+    "@modelcontextprotocol/server": "^2.4.0",
     "mongoose": "^9.12.1",
     "ws": "^8.23.0",
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@modelcontextprotocol/client": "^2.4.0",
     "@types/node": "^22.20.5",
     "@types/ws": "^8.18.2",
     "tsc-alias": "^1.9.10",

@@ -262,3 +262,11 @@ export interface JolpicaCircuitTable {
 }
 
 export type JolpicaCircuitsResponse = JolpicaResponse<{ CircuitTable: JolpicaCircuitTable }>;
+
+export interface F1SectionRead {
+  section: F1Section;
+  source: 'cache' | 'live';
+  fetchedAt: string | null;
+  asOf: string | null;
+  stale: boolean;
+}

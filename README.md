@@ -18,6 +18,17 @@ Node + TypeScript backend for Desk Hub: an ESP32-S3 touch display, a React web a
 - `npm run device:list` – list displays, when they were last seen, and which are revoked
 - `npm run device:revoke -- <id or name>` – revoke a display's key (disconnects it within 30s)
 
+## MCP server (F1 tools for Claude)
+
+Six read-only tools: `get_next_race`, `get_last_race_result`, `get_standings`, `get_season_calendar`, `get_race_result` (any race since 1950) and `get_circuit_results`. Current-season tools read the backend's cache; past races come from Jolpica.
+
+```bash
+npm run build
+claude mcp add desk-hub -- "$(which node)" --env-file="$(pwd)/.env" "$(pwd)/build/mcp/stdio.js"
+```
+
+For Claude Desktop, add the same command and arguments to `claude_desktop_config.json`, using the absolute path of `node`.
+
 ## Credits
 
 - F1 data: [Jolpica F1 API](https://github.com/jolpica/jolpica-f1).

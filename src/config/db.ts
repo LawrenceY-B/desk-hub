@@ -11,7 +11,12 @@ export async function connectDb(): Promise<void> {
     throw err;
   }
 
-  console.log(`Connected to MongoDB (${mongoose.connection.name})`);
+  // stderr: the MCP server shares this, and over stdio stdout is the protocol channel.
+  console.error(`Connected to MongoDB (${mongoose.connection.name})`);
+}
+
+export function isDbConnected(): boolean {
+  return mongoose.connection.readyState === mongoose.ConnectionStates.connected;
 }
 
 export async function disconnectDb(): Promise<void> {

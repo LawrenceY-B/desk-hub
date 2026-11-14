@@ -62,8 +62,8 @@ Rule: only the backend talks to third parties and holds secrets. The display and
 4. ✅ Track outlines (`npm run build:tracks`, `getTrackOutline`)
 5. ✅ Refresh schedule logic, with unit tests (`src/providers/f1.schedule.ts`, `npm test`)
 6. Aggregator payload and device WebSocket ← **start here**
-7. F1 MCP tools (same structure as the `lyb-cedi-market` MCP server)
-8. Test in Claude Desktop
+7. ✅ F1 MCP tools (same structure as the `lyb-cedi-market` MCP server)
+8. Test in Claude Desktop ← **start here**
 
 Then: web API v1 (auth, display config and snapshot, watchlist, tasks) → Jarvis text chat → Siri Shortcut endpoint.
 
@@ -84,15 +84,17 @@ src/
   scripts/       build-time scripts (build-tracks.ts)
   controllers/   Express handlers
   routes/        Express routers
-  mcp/tools/     MCP tool definitions
+  mcp/           MCP server: `server.ts` (createServer + instructions), `stdio.ts` (entry), `format.ts`, `tools/`
   utils/         small helpers
   test/          shared test helpers
 ```
 
-Scripts: `npm run dev` (tsx watch, loads `.env`), `npm run typecheck`, `npm test` (node:test via tsx, `*.test.ts` next to the code), `npm run build:tracks` (regenerates track outlines), `npm run device:create -- "Name"` (prints a device key once; only its SHA-256 hash is stored), `npm run device:list`, `npm run device:revoke -- <id or exact name>` (sets `revokedAt`; the hub re-checks connected devices each heartbeat and closes them with 4001), `npm run build` (cleans `build/`, compiles with `tsconfig.build.json`, which leaves out tests, `src/test` and `src/scripts`, then tsc-alias rewrites `@/` to relative paths), `npm start`.
+Scripts: `npm run dev` (tsx watch, loads `.env`), `npm run typecheck`, `npm test` (node:test via tsx, `*.test.ts` next to the code), `npm run build:tracks` (regenerates track outlines), `npm run device:create -- "Name"` (prints a device key once; only its SHA-256 hash is stored), `npm run device:list`, `npm run mcp` (MCP server over stdio from source; `npm run mcp:start` runs the build), `npm run device:revoke -- <id or exact name>` (sets `revokedAt`; the hub re-checks connected devices each heartbeat and closes them with 4001), `npm run build` (cleans `build/`, compiles with `tsconfig.build.json`, which leaves out tests, `src/test` and `src/scripts`, then tsc-alias rewrites `@/` to relative paths), `npm start`.
 Local MongoDB runs in Docker: `docker compose up -d` (`compose.yaml`, `mongo:7`, bound to 127.0.0.1, `mongo-data` volume). `MONGODB_URI` is required; tests use `.env.test` (committed, no secrets). DB tests call `useTestDatabase(name)` from `src/test/db.ts`, which gives each test file its own `desk-hub-test-<name>` database (files run in parallel) and skips when Mongo is down.
 Node 22+, TypeScript 6, ESM (`"type": "module"`, NodeNext). Express, Mongoose and the MCP SDK get added in the steps that need them.
 
 ## Status
 
-Steps 1–5 done. Step 6 mostly done: aggregator, section cache, device hub (auth by hashed key, snapshot, `section`, resume via `X-Resume: <epoch>:<seq>`, 30s ping). The device gets trimmed display data (`src/device/display/`, F1 16 KB → 2.9 KB, shaped by the Desk Hub UI F1 artboard); the cache keeps full data for the web app. Left in step 6: `config.changed`, `jarvis.*`, `alert.*`, `task.done` once the web API and Jarvis exist.
+Steps 1–7 done. Step 6's `config.changed`, `jarvis.*`, `alert.*` and `task.done` wait for the web API and Jarvis. Next: step 8, register the MCP server in Claude Desktop and try it.
+
+MCP notes: SDK v2 (`@modelcontextprotocol/server`, client in devDependencies for tests). Six read-only F1 tools; current-season tools read the aggregator's Mongo cache via `services/f1-read.service.ts` and fall back to a live fetch. `connectDb` logs to stderr so it is safe over stdio. Register with the absolute node path and `--env-file` (Claude Desktop's PATH may resolve an old node): `node --env-file=<repo>/.env <repo>/build/mcp/stdio.js`; rebuild after changes.
