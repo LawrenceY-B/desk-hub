@@ -1,12 +1,15 @@
 import type { SectionPayload, SectionsPayload, SnapshotMessage } from '@/types/device.js';
 import type { CacheEntry } from '@/types/section.js';
+import { hashData } from '@/utils/hash.js';
+import { toDisplayData } from './display/index.js';
 
-export const PAYLOAD_VERSION = 1;
+export const PAYLOAD_VERSION = 2;
 
 export function toSectionPayload(entry: CacheEntry<unknown>): SectionPayload {
+  const data = toDisplayData(entry.key, entry.data);
   return {
-    data: entry.data,
-    hash: entry.hash,
+    data,
+    hash: data === null ? null : hashData(data),
     asOf: entry.asOf,
     fetchedAt: entry.fetchedAt,
     stale: entry.stale,

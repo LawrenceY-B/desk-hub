@@ -7,13 +7,15 @@ import { WebSocket } from 'ws';
 import { createEmptyEntry } from '@/services/section-cache.service.js';
 import type { DeviceHub, DeviceHubDeps, ServerMessage } from '@/types/device.js';
 import type { CacheEntry } from '@/types/section.js';
+import { hashData } from '@/utils/hash.js';
 import { createDeviceHub } from './device-hub.js';
 
 const KEY = 'dh_test-key';
 const NOW = new Date('2026-11-14T12:00:00.000Z');
 
-function f1Entry(data: unknown, hash: string): CacheEntry<unknown> {
-  return { ...createEmptyEntry('f1', NOW), data, hash, fetchedAt: NOW.toISOString(), asOf: '2026-11-08T17:00:00.000Z' };
+// 'mkt' has no display mapper yet, so its data reaches the device unchanged.
+function mktEntry(data: unknown, hash: string, stale = false): CacheEntry<unknown> {
+  return { ...createEmptyEntry('mkt', NOW), data, hash, stale, fetchedAt: NOW.toISOString(), asOf: '2026-11-08T17:00:00.000Z' };
 }
 
 function fakeAggregator(entries: CacheEntry<unknown>[]) {
@@ -31,7 +33,7 @@ let hub: DeviceHub;
 let logs: string[];
 const open: WebSocket[] = [];
 
-async function start(overrides: Partial<DeviceHubDeps> = {}, entries = [f1Entry({ round: 21 }, 'h1')]) {
+async function start(overrides: Partial<DeviceHubDeps> = {}, entries = [mktEntry({ round: 21 }, 'h1')]) {
   const aggregator = fakeAggregator(entries);
   logs = [];
   server = createServer();
@@ -118,9 +120,9 @@ describe('messages', () => {
     assert.equal(snapshot.seq, 0);
     assert.equal(snapshot.epoch, 'e1');
     if (snapshot.type === 'snapshot') {
-      assert.deepEqual(snapshot.sections.f1, {
+      assert.deepEqual(snapshot.sections.mkt, {
         data: { round: 21 },
-        hash: 'h1',
+        hash: hashData({ round: 21 }),
         asOf: '2026-11-08T17:00:00.000Z',
         fetchedAt: NOW.toISOString(),
         stale: false,
@@ -143,16 +145,40 @@ describe('messages', () => {
     await opened(socket);
     await until(() => messages.length === 1);
 
-    aggregator.emit(f1Entry({ round: 22 }, 'h2'));
-    aggregator.emit(f1Entry({ round: 23 }, 'h3'));
+    aggregator.emit(mktEntry({ round: 22 }, 'h2'));
+    aggregator.emit(mktEntry({ round: 23 }, 'h3'));
     await until(() => messages.length === 3);
 
     assert.deepEqual(messages.slice(1).map((m) => [m.type, m.seq]), [['section', 1], ['section', 2]]);
   });
 
+  test('a cache change the display cannot see is not pushed', async () => {
+    const { url, aggregator } = await start();
+    const { socket, messages } = connect(url);
+    await opened(socket);
+    await until(() => messages.length === 1);
+
+    aggregator.emit(mktEntry({ round: 21 }, 'a-different-cache-hash'));
+    aggregator.emit(mktEntry({ round: 22 }, 'h2'));
+    await until(() => messages.length === 2);
+
+    assert.deepEqual([messages[1]?.type, messages[1]?.seq], ['section', 1]);
+  });
+
+  test('a stale flip is pushed even when the data is the same', async () => {
+    const { url, aggregator } = await start();
+    const { socket, messages } = connect(url);
+    await opened(socket);
+    await until(() => messages.length === 1);
+
+    aggregator.emit(mktEntry({ round: 21 }, 'h1', true));
+    await until(() => messages.length === 2);
+    assert.equal(messages[1]?.type === 'section' && messages[1].section.stale, true);
+  });
+
   test('resume with the current epoch and seq: no snapshot', async () => {
     const { url, aggregator } = await start();
-    aggregator.emit(f1Entry({ round: 22 }, 'h2'));
+    aggregator.emit(mktEntry({ round: 22 }, 'h2'));
     const { socket, messages } = connect(url, { authorization: `Bearer ${KEY}`, 'x-resume': 'e1:1' });
     await opened(socket);
     await until(() => messages.length === 1);
@@ -161,7 +187,7 @@ describe('messages', () => {
 
   test('resume after missing an update: snapshot', async () => {
     const { url, aggregator } = await start();
-    aggregator.emit(f1Entry({ round: 22 }, 'h2'));
+    aggregator.emit(mktEntry({ round: 22 }, 'h2'));
     const { socket, messages } = connect(url, { authorization: `Bearer ${KEY}`, 'x-resume': 'e1:0' });
     await opened(socket);
     await until(() => messages.length === 1);

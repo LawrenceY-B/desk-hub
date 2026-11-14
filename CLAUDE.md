@@ -77,7 +77,7 @@ src/
   clients/       thin HTTP clients for third parties (Jolpica first)
   providers/     one SectionProvider per section
   aggregator/    runs providers on schedule, caches to Mongo, emits `section` events
-  device/        device WebSocket hub (`/device`) and payload builders
+  device/        device WebSocket hub (`/device`), payload builders, `display/` mappers (full cache data → what each screen shows)
   models/        Mongoose schemas (one per collection)
   services/      business logic, no Express or MCP code
   data/          generated data (track outlines); never edit by hand
@@ -95,4 +95,4 @@ Node 22+, TypeScript 6, ESM (`"type": "module"`, NodeNext). Express, Mongoose an
 
 ## Status
 
-Steps 1–5 done. Step 6 mostly done: aggregator, section cache, device hub (auth by hashed key, snapshot, `section`, resume via `X-Resume: <epoch>:<seq>`, 30s ping). Left in step 6: trim the display payload (F1 is ~16 KB), then `config.changed`, `jarvis.*`, `alert.*`, `task.done` once the web API and Jarvis exist.
+Steps 1–5 done. Step 6 mostly done: aggregator, section cache, device hub (auth by hashed key, snapshot, `section`, resume via `X-Resume: <epoch>:<seq>`, 30s ping). The device gets trimmed display data (`src/device/display/`, F1 16 KB → 2.9 KB, shaped by the Desk Hub UI F1 artboard); the cache keeps full data for the web app. Left in step 6: `device:revoke`, then `config.changed`, `jarvis.*`, `alert.*`, `task.done` once the web API and Jarvis exist.

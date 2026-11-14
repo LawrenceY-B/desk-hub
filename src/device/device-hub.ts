@@ -4,7 +4,7 @@ import type { Duplex } from 'node:stream';
 import { WebSocket, WebSocketServer, type RawData } from 'ws';
 import { z } from 'zod';
 import type { DeviceHub, DeviceHubDeps, DeviceIdentity, ServerMessage } from '@/types/device.js';
-import type { CacheEntry } from '@/types/section.js';
+import type { CacheEntry, SectionKey } from '@/types/section.js';
 import { buildSnapshot, toSectionPayload } from './payload.js';
 
 export const DEVICE_PATH = '/device';
@@ -30,7 +30,10 @@ export function createDeviceHub(server: Server, deps: DeviceHubDeps): DeviceHub 
   const wss = new WebSocketServer({ noServer: true, maxPayload: MAX_INCOMING_BYTES });
   const epoch = deps.epoch ?? randomBytes(4).toString('hex');
   const clients = new Map<string, Client>();
+  const lastSent = new Map<SectionKey, string>();
   let seq = 0;
+
+  for (const entry of deps.aggregator.getAll()) lastSent.set(entry.key, sentKey(toSectionPayload(entry)));
 
   function send(socket: WebSocket, message: ServerMessage): void {
     if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message));
@@ -112,7 +115,13 @@ export function createDeviceHub(server: Server, deps: DeviceHubDeps): DeviceHub 
     deps.log(`device "${client.device.name}" sent ${message.type}, not supported yet`);
   }
 
+  // The cache changes when anything in the full data changes; only push when what the display shows changed.
   function onSection(entry: CacheEntry<unknown>): void {
+    const section = toSectionPayload(entry);
+    const key = sentKey(section);
+    if (lastSent.get(entry.key) === key) return;
+    lastSent.set(entry.key, key);
+
     seq++;
     const message: ServerMessage = {
       type: 'section',
@@ -120,7 +129,7 @@ export function createDeviceHub(server: Server, deps: DeviceHubDeps): DeviceHub 
       seq,
       generatedAt: deps.now().toISOString(),
       key: entry.key,
-      section: toSectionPayload(entry),
+      section,
     };
     for (const client of clients.values()) send(client.socket, message);
   }
@@ -169,4 +178,8 @@ export function createDeviceHub(server: Server, deps: DeviceHubDeps): DeviceHub 
 
     connectedDevices: () => [...clients.values()].map((c) => c.device),
   };
+}
+
+function sentKey(section: { hash: string | null; stale: boolean }): string {
+  return `${section.hash}:${section.stale}`;
 }
