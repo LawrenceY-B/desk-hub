@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { fetchAllCircuits } from '@/clients/jolpica.js';
 import type { JolpicaCircuit } from '@/types/f1.js';
 import type { TrackOutline } from '@/types/track.js';
-import { centroid, haversineKm, normalize, projectToMetres, simplifyToRange } from '@/utils/geo.js';
+import { centroid, haversineKm, normalize, projectToMetres, rotateToLandscape, simplifyToRange } from '@/utils/geo.js';
 
 const SOURCE_COMMIT = '8094e957b8d6aa8b9f4510c93968556cccd30e02';
 const SOURCE_URL = `https://raw.githubusercontent.com/bacinger/f1-circuits/${SOURCE_COMMIT}/f1-circuits.geojson`;
@@ -89,12 +89,14 @@ async function main() {
     if (existing) throw new Error(`${properties.id} and ${existing.sourceId} both match ${circuit.circuitId}`);
 
     const simplified = simplifyToRange(projectToMetres(geometry.coordinates), MIN_POINTS, MAX_POINTS);
+    const { points, rotation } = rotateToLandscape(simplified);
     outlines.set(circuit.circuitId, {
       circuitId: circuit.circuitId,
       name: circuit.circuitName,
       sourceId: properties.id,
       lengthM: properties.length ?? null,
-      ...normalize(simplified, SIZE),
+      rotation,
+      ...normalize(points, SIZE),
     });
   }
 

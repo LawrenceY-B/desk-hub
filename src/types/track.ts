@@ -8,5 +8,6 @@ export interface TrackOutline {
   lengthM: number | null;
   width: number;
   height: number;
+  rotation: 0 | 90;
   points: Point[];
 }

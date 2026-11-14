@@ -84,6 +84,16 @@ export function simplifyToRange(points: Point[], min: number, max: number): Poin
   return best;
 }
 
+// The display's track card is landscape, so a tall track is turned 90° clockwise to fill it.
+export function rotateToLandscape(points: Point[]): { points: Point[]; rotation: 0 | 90 } {
+  const xs = points.map((p) => p[0]);
+  const ys = points.map((p) => p[1]);
+  const width = Math.max(...xs) - Math.min(...xs);
+  const height = Math.max(...ys) - Math.min(...ys);
+  if (height <= width) return { points, rotation: 0 };
+  return { points: points.map(([x, y]) => [y, -x]), rotation: 90 };
+}
+
 // Fit into a box whose longest side is `size`, keeping the aspect ratio.
 // Screen y grows downwards, so north is flipped to the top.
 export function normalize(points: Point[], size: number): { width: number; height: number; points: Point[] } {

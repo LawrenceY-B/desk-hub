@@ -29,7 +29,7 @@ const nextRace: NextRace = {
     sprint: null,
     qualifying: { date: '2026-11-21', startsAt: '2026-11-21T04:00:00Z' },
   },
-  track: { circuitId: 'vegas', name: 'x', sourceId: 'us-2023', lengthM: 6201, width: 1000, height: 640, points: [[0, 0], [10, 20]] },
+  track: { circuitId: 'vegas', name: 'x', sourceId: 'us-2023', lengthM: 6201, width: 1000, height: 640, rotation: 90, points: [[0, 0], [10, 20]] },
 };
 
 function entry(pos: number, name: string, teamName: string, grid: number | null, time: string | null, status = 'Finished'): ResultEntry {

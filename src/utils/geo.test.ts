@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import type { Point } from '@/types/track.js';
-import { haversineKm, normalize, simplify, simplifyToRange } from './geo.js';
+import { haversineKm, normalize, rotateToLandscape, simplify, simplifyToRange } from './geo.js';
 
 describe('haversineKm', () => {
   test('same point is 0', () => assert.equal(haversineKm(45.6, 9.28, 45.6, 9.28), 0));
@@ -53,5 +53,29 @@ describe('normalize', () => {
   test('flips y so north is at the top', () => {
     const { points } = normalize([[0, 0], [0, 100]], 1000);
     assert.deepEqual(points, [[0, 1000], [0, 0]]);
+  });
+});
+
+describe('rotateToLandscape', () => {
+  test('a wide shape is left alone', () => {
+    const wide: Point[] = [[0, 0], [100, 0], [100, 40]];
+    assert.deepEqual(rotateToLandscape(wide), { points: wide, rotation: 0 });
+  });
+
+  test('a square is left alone', () => {
+    assert.equal(rotateToLandscape([[0, 0], [10, 10]]).rotation, 0);
+  });
+
+  test('a tall shape is turned 90° clockwise and becomes wide', () => {
+    const { points, rotation } = rotateToLandscape([[0, 0], [40, 0], [40, 100]]);
+    assert.equal(rotation, 90);
+    const { width, height } = normalize(points, 1000);
+    assert.ok(width > height, `${width}×${height}`);
+  });
+
+  test('clockwise: what was north ends up on the right (east)', () => {
+    const { points } = rotateToLandscape([[0, 0], [0, 100]]);
+    const { points: screen } = normalize(points, 1000);
+    assert.deepEqual(screen, [[0, 0], [1000, 0]]);
   });
 });
