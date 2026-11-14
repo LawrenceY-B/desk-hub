@@ -24,6 +24,7 @@ This is a learning project. **Lawrence writes the code.** Claude's job is to gui
 - Dates in UTC ISO strings. Missing numbers are `null`, never `0`.
 - No secrets in code or logs. Third-party tokens (Azure DevOps PAT, Spotify) are stored encrypted and never returned by the API.
 - Type check with `tsc --noEmit` before calling a step done (`tsx` does not type-check).
+- Types: every interface and type lives in `src/types/` (one file per area, e.g. `f1.ts`, `section.ts`, `aggregator.ts`), including deps and inputs used by a single module. Exceptions: `Env` (inferred from the zod schema in `config/env.ts`) and small helper types inside `*.test.ts` files.
 - Comments: Lawrence doesn't like them. Only comment code that is genuinely complex or non-obvious (a why, not a what). No doc comments on simple functions or types, no section banners, no commented-out code.
 - MCP server: never write to stdout in stdio mode (log to stderr).
 - Commits: conventional commits. **Never add Claude attribution to commits or PRs.**
@@ -75,6 +76,7 @@ src/
   types/         shared types (F1, payload, sections)
   clients/       thin HTTP clients for third parties (Jolpica first)
   providers/     one SectionProvider per section
+  aggregator/    runs providers on schedule, caches to Mongo, emits `section` events
   models/        Mongoose schemas (one per collection)
   services/      business logic, no Express or MCP code
   data/          generated data (track outlines); never edit by hand

@@ -1,12 +1,4 @@
-import type { Race, ScheduledTime } from '@/types/f1.js';
-
-export interface ScheduleInput {
-  now: Date;
-  calendar: Race[];
-  lastResultRound: number | null;
-  consecutiveFailures: number;
-  retryAt: Date | null;
-}
+import type { Race, ScheduleInput, ScheduledTime } from '@/types/f1.js';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;

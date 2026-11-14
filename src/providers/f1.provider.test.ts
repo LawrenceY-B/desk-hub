@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
-import type { F1Section, Race, RaceResult } from '@/types/f1.js';
+import type { F1ProviderDeps, F1Section, Race, RaceResult } from '@/types/f1.js';
 import type { CacheEntry } from '@/types/section.js';
 import type { TrackOutline } from '@/types/track.js';
-import { createF1Provider, type F1ProviderDeps } from './f1.provider.js';
+import { createF1Provider } from './f1.provider.js';
 
 const HOUR = 60 * 60 * 1000;
 

@@ -1,4 +1,5 @@
 export type Point = [x: number, y: number];
+export type LonLat = [lon: number, lat: number];
 
 export interface TrackOutline {
   circuitId: string;

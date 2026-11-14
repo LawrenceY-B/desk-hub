@@ -108,6 +108,27 @@ export interface F1Section {
   constructors: Standings<ConstructorStanding> | null;
 }
 
+export interface ScheduleInput {
+  now: Date;
+  calendar: Race[];
+  lastResultRound: number | null;
+  consecutiveFailures: number;
+  retryAt: Date | null;
+}
+
+export interface F1ProviderDeps {
+  getSeasonCalendar: () => Promise<Race[]>;
+  getNextRace: () => Promise<Race | null>;
+  getLastResult: () => Promise<RaceResult | null>;
+  getDriverStandings: () => Promise<Standings<DriverStanding> | null>;
+  getConstructorStandings: () => Promise<Standings<ConstructorStanding> | null>;
+  getTrackOutline: (circuitId: string) => TrackOutline | null;
+  saveCalendar: (races: Race[]) => Promise<void>;
+  loadCalendar: (season: number) => Promise<Race[]>;
+  sleep: (ms: number) => Promise<void>;
+  currentYear: () => number;
+}
+
 export interface JolpicaResponse<T> {
   MRData: {
     xmlns: string;

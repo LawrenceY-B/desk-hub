@@ -1,6 +1,4 @@
-import type { Point } from '@/types/track.js';
-
-export type LonLat = [lon: number, lat: number];
+import type { LonLat, Point } from '@/types/track.js';
 
 const EARTH_RADIUS_KM = 6371;
 const toRad = (deg: number) => (deg * Math.PI) / 180;

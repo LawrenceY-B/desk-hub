@@ -7,24 +7,11 @@ import {
   getSeasonCalendar,
 } from '@/services/f1.service.js';
 import { getTrackOutline } from '@/services/tracks.service.js';
-import type { F1Section, Race, RaceResult } from '@/types/f1.js';
+import type { F1ProviderDeps, F1Section, Race, RaceResult } from '@/types/f1.js';
 import type { SectionProvider } from '@/types/section.js';
 import { nextRunAt as scheduleNextRun } from './f1.schedule.js';
 
 const GAP_BETWEEN_CALLS_MS = 300;
-
-export interface F1ProviderDeps {
-  getSeasonCalendar: typeof getSeasonCalendar;
-  getNextRace: typeof getNextRace;
-  getLastResult: typeof getLastResult;
-  getDriverStandings: typeof getDriverStandings;
-  getConstructorStandings: typeof getConstructorStandings;
-  getTrackOutline: typeof getTrackOutline;
-  saveCalendar: typeof saveCalendar;
-  loadCalendar: typeof loadCalendar;
-  sleep: (ms: number) => Promise<void>;
-  currentYear: () => number;
-}
 
 const defaultDeps: F1ProviderDeps = {
   getSeasonCalendar,

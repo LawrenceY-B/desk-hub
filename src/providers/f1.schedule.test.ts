@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
-import type { Race, RaceSessions, ScheduledTime } from '@/types/f1.js';
-import { nextRunAt, type ScheduleInput } from './f1.schedule.js';
+import type { Race, RaceSessions, ScheduleInput, ScheduledTime } from '@/types/f1.js';
+import { nextRunAt } from './f1.schedule.js';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
