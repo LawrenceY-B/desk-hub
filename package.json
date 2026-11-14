@@ -1,0 +1,25 @@
+{
+  "name": "desk-hub",
+  "version": "0.1.0",
+  "description": "Backend for Desk Hub: aggregates F1, markets, sport, tasks and DevOps for an ESP32 display, a web app and Jarvis.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=.env src/index.ts",
+    "build": "tsc && tsc-alias",
+    "start": "node --env-file-if-exists=.env build/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsc-alias": "^1.9.10",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3"
+  }
+}
