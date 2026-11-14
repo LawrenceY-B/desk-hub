@@ -1,4 +1,5 @@
 import { env } from '@/config/env.js';
+import { RateLimitError } from '@/utils/errors.js';
 import type {
     JolpicaCircuitsResponse,
     JolpicaRacesResponse,
@@ -10,12 +11,10 @@ const BASE_URL = env.JOLPICA_BASE_URL;
 const USER_AGENT = env.USER_AGENT;
 const DEFAULT_RETRY_MS = 60_000;
 
-export class JolpicaRateLimitError extends Error {
-    readonly retryAt: Date;
+export class JolpicaRateLimitError extends RateLimitError {
     constructor(retryAt: Date) {
-        super(`Jolpica rate limited until ${retryAt.toISOString()}`);
+        super(`Jolpica rate limited until ${retryAt.toISOString()}`, retryAt);
         this.name = 'JolpicaRateLimitError';
-        this.retryAt = retryAt;
     }
 }
 
